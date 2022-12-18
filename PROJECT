@@ -1,0 +1,16 @@
+domain: kubestack.nicklasfrahm.dev
+layout:
+- go.kubebuilder.io/v3
+projectName: kubestack
+repo: github.com/nicklasfrahm/kubestack
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: nicklasfrahm.dev
+  group: kubestack
+  kind: Connection
+  path: github.com/nicklasfrahm/kubestack/api/v1alpha1
+  version: v1alpha1
+version: "3"

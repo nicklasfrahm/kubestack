@@ -1,0 +1,89 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: connections.kubestack.nicklasfrahm.dev
+spec:
+  group: kubestack.nicklasfrahm.dev
+  names:
+    kind: Connection
+    listKind: ConnectionList
+    plural: connections
+    singular: connection
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.protocol
+      name: Protocol
+      type: string
+    - jsonPath: .spec.os
+      name: OS
+      type: string
+    - jsonPath: .status.hostname
+      name: Hostname
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Connection is the Schema for the connections API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ConnectionSpec defines the desired state of Connection
+            properties:
+              os:
+                description: OS is the operating system of the host.
+                enum:
+                - Ubuntu
+                - NXOS
+                type: string
+              protocol:
+                description: Protocol is the protocol used to connect to the host.
+                enum:
+                - SSH
+                type: string
+              secretRef:
+                description: SecretRef is the reference to a secret containing sensitive
+                  connection credentials.
+                properties:
+                  name:
+                    description: name is unique within a namespace to reference a
+                      secret resource.
+                    type: string
+                  namespace:
+                    description: namespace defines the space within which the secret
+                      name must be unique.
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+            required:
+            - os
+            - protocol
+            - secretRef
+            type: object
+          status:
+            description: ConnectionStatus defines the observed state of Connection
+            properties:
+              hostname:
+                description: Hostname is the hostname of the host.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

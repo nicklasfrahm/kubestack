@@ -1,0 +1,40 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - kubestack.nicklasfrahm.dev
+  resources:
+  - connections
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kubestack.nicklasfrahm.dev
+  resources:
+  - connections/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kubestack.nicklasfrahm.dev
+  resources:
+  - connections/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - kubestack.nicklasfrahm.dev
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
