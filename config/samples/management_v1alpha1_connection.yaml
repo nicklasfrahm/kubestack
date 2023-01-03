@@ -7,10 +7,10 @@ metadata:
     app.kubernetes.io/part-of: kubestack
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: kubestack
-  name: delta
+  name: alfa
 spec:
   protocol: SSH
-  os: Ubuntu
   secretRef:
-    name: connection-delta
+    name: connection-alfa
     namespace: default
+  

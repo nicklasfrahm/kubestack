@@ -9,9 +9,13 @@ metadata:
 spec:
   group: kubestack.nicklasfrahm.dev
   names:
+    categories:
+    - kubestack
     kind: Connection
     listKind: ConnectionList
     plural: connections
+    shortNames:
+    - conns
     singular: connection
   scope: Namespaced
   versions:
@@ -21,9 +25,6 @@ spec:
       type: string
     - jsonPath: .spec.os
       name: OS
-      type: string
-    - jsonPath: .status.hostname
-      name: Hostname
       type: string
     name: v1alpha1
     schema:
@@ -45,12 +46,6 @@ spec:
           spec:
             description: ConnectionSpec defines the desired state of Connection
             properties:
-              os:
-                description: OS is the operating system of the host.
-                enum:
-                - Ubuntu
-                - NXOS
-                type: string
               protocol:
                 description: Protocol is the protocol used to connect to the host.
                 enum:
@@ -71,15 +66,14 @@ spec:
                 type: object
                 x-kubernetes-map-type: atomic
             required:
-            - os
             - protocol
             - secretRef
             type: object
           status:
             description: ConnectionStatus defines the observed state of Connection
             properties:
-              hostname:
-                description: Hostname is the hostname of the host.
+              os:
+                description: OS is the discovered operating system of the host.
                 type: string
             type: object
         type: object

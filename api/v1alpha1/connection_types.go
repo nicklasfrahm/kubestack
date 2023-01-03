@@ -29,16 +29,6 @@ const (
 	ProtocolSSH Protocol = "SSH"
 )
 
-// OperatingSystem is the operating system of the host.
-type OperatingSystem string
-
-const (
-	// OperatingSystemUbuntu is the Ubuntu operating system.
-	OperatingSystemUbuntu OperatingSystem = "Ubuntu"
-	// OperatingSystemNXOS is the Cisco NX-OS operating system.
-	OperatingSystemNXOS OperatingSystem = "NXOS"
-)
-
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -51,10 +41,6 @@ type ConnectionSpec struct {
 	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum=SSH
 	Protocol Protocol `json:"protocol"`
-	// OS is the operating system of the host.
-	//+kubebuilder:validation:Required
-	//+kubebuilder:validation:Enum=Ubuntu;NXOS
-	OS OperatingSystem `json:"os"`
 
 	// SecretRef is the reference to a secret containing sensitive connection credentials.
 	//+kubebuilder:validation:Required
@@ -66,15 +52,15 @@ type ConnectionStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Hostname is the hostname of the host.
-	Hostname string `json:"hostname,omitempty"`
+	// OS is the discovered operating system of the host.
+	OS string `json:"os,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:shortName=conns,path=connections,categories=kubestack
 //+kubebuilder:printcolumn:name="Protocol",type=string,JSONPath=`.spec.protocol`
 //+kubebuilder:printcolumn:name="OS",type=string,JSONPath=`.spec.os`
-//+kubebuilder:printcolumn:name="Hostname",type=string,JSONPath=`.status.hostname`
 
 // Connection is the Schema for the connections API
 type Connection struct {
