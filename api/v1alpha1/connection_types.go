@@ -29,6 +29,14 @@ const (
 	ProtocolSSH Protocol = "SSH"
 )
 
+// OSInfo describes the operating system of a system.
+type OSInfo struct {
+	// Name is the name of the operating system.
+	Name string `json:"name"`
+	// Version is the version of the operating system.
+	Version string `json:"version"`
+}
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -52,15 +60,16 @@ type ConnectionStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// OS is the discovered operating system of the host.
-	OS string `json:"os,omitempty"`
+	// OS contains information about the discovered operating system of the system.
+	OS OSInfo `json:"os,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:shortName=conns,path=connections,categories=kubestack
 //+kubebuilder:printcolumn:name="Protocol",type=string,JSONPath=`.spec.protocol`
-//+kubebuilder:printcolumn:name="OS",type=string,JSONPath=`.spec.os`
+//+kubebuilder:printcolumn:name="OS-Name",type=string,JSONPath=`.status.os.name`
+//+kubebuilder:printcolumn:name="OS-Version",type=string,JSONPath=`.status.os.version`
 
 // Connection is the Schema for the connections API
 type Connection struct {

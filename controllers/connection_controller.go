@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	kubestackv1alpha1 "github.com/nicklasfrahm/kubestack/api/v1alpha1"
+	"github.com/nicklasfrahm/kubestack/pkg/util"
 )
 
 // ConnectionReconciler reconciles a Connection object
@@ -51,7 +53,7 @@ type ConnectionReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.1/pkg/reconcile
 func (r *ConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	ctxLog := log.FromContext(ctx)
+	_ = log.FromContext(ctx)
 
 	conn := new(kubestackv1alpha1.Connection)
 	if err := r.Client.Get(ctx, req.NamespacedName, conn); err != nil {
@@ -66,7 +68,23 @@ func (r *ConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	ctxLog.Info("Reconciling Connection", "host", string(secret.Data["host"]))
+	// Update the connection status with the OS information.
+	osInfo, err := util.ProbeOS(conn, secret)
+	if err != nil {
+		// TODO: Log event if SSH connection fails.
+		return ctrl.Result{
+			RequeueAfter: 15 * time.Second,
+		}, err
+	}
+	conn.Status.OS = *osInfo
+
+	if err := r.Status().Update(ctx, conn); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	r.recorder.Event(conn, corev1.EventTypeNormal, "OSProbed", "OS information probed successfully.")
+
+	// TODO: Implement other logic.
 
 	return ctrl.Result{}, nil
 }
