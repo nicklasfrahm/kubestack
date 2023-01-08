@@ -3,7 +3,7 @@ kind: Connection
 metadata:
   labels:
     app.kubernetes.io/name: connection
-    app.kubernetes.io/instance: delta
+    app.kubernetes.io/instance: alfa
     app.kubernetes.io/part-of: kubestack
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: kubestack
@@ -12,5 +12,21 @@ spec:
   protocol: SSH
   secretRef:
     name: connection-alfa
+    namespace: default
+---
+apiVersion: kubestack.nicklasfrahm.dev/v1alpha1
+kind: Connection
+metadata:
+  labels:
+    app.kubernetes.io/name: connection
+    app.kubernetes.io/instance: distswitch00
+    app.kubernetes.io/part-of: kubestack
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kubestack
+  name: distswitch00
+spec:
+  protocol: SSH
+  secretRef:
+    name: connection-distswitch00
     namespace: default
   

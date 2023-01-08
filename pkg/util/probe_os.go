@@ -45,7 +45,7 @@ func probeOSViaSSH(secret *corev1.Secret) (*v1alpha1.OSInfo, error) {
 		Fingerprint: string(secret.Data["fingerprint"]),
 	}
 
-	client, err := sshx.NewClient(config)
+	client, err := sshx.NewClient(config, sshx.WithSTFPDisabled())
 	if err != nil {
 		return nil, err
 	}

@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -71,7 +72,9 @@ func (r *ConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	// Update the connection status with the OS information.
 	osInfo, err := util.ProbeOS(conn, secret)
 	if err != nil {
-		// TODO: Log event if SSH connection fails.
+		if strings.HasPrefix(err.Error(), "ssh:") {
+			r.recorder.Event(conn, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
+		}
 		return ctrl.Result{
 			RequeueAfter: 15 * time.Second,
 		}, err
