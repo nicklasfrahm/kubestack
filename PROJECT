@@ -1,4 +1,4 @@
-domain: kubestack.nicklasfrahm.dev
+domain: nicklasfrahm.dev
 layout:
 - go.kubebuilder.io/v3
 projectName: kubestack

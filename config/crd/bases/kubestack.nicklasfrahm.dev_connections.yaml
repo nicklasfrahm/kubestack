@@ -10,12 +10,12 @@ spec:
   group: kubestack.nicklasfrahm.dev
   names:
     categories:
-    - kubestack
+    - all
     kind: Connection
     listKind: ConnectionList
     plural: connections
     shortNames:
-    - conns
+    - conn
     singular: connection
   scope: Namespaced
   versions:
