@@ -26,3 +26,9 @@ Dockerfile.cross
 
 # Secrets containing credentials.
 **/secrets.yaml
+
+# Python virtualenv
+.venv/
+
+# Build artifacts
+public/

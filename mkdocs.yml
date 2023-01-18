@@ -1,0 +1,21 @@
+site_name: Kubestack
+site_dir: public
+site_url: https://kubestack.nicklasfrahm.dev/
+repo_url: https://github.com/nicklasfrahm/kubestack
+repo_name: nicklasfrahm/kubestack
+edit_uri: edit/main/docs/
+strict: yes
+use_directory_urls: no
+theme:
+  name: material
+  features:
+  - navigation.instant
+  - navigation.tracking
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.expand
+  - navigation.top
+nav:
+  - Overview: index.md
+  - Management: management.md
+  - Networking: networking.md
