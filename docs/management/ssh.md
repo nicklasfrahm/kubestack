@@ -2,7 +2,30 @@
 
 This section describes how to connect to appliances using SSH.
 
-## Secret
+## Prerequisites
+
+Managing an appliance using SSH requires that the login shell of the user is `bash`.
+
+### NX-OS
+
+To enable the `bash` login shell on NX-OS, you need to run the following commands.
+
+```shell
+# Enter configuration mode.
+configure terminal
+# Configure bash as the login shell for the user "admin".
+username admin shelltype bash
+# Exit configuration mode.
+exit
+# Persist settings between reboots.
+copy running-config startup-config
+```
+
+After reconnecting to the appliance, `bash` is now your default shell. You may enter the NX-OS VSH for configuration commands by running `vsh`.
+
+## Configuration
+
+### Secret
 
 Below you may find an example of a `Secret` for an SSH connection using all possible keys. The usage of an encrypted private key and a jump host is optional.
 
@@ -36,7 +59,7 @@ stringData:
     -----END OPENSSH PRIVATE KEY-----
 ```
 
-## Connection
+### Connection
 
 Below, you may find a simple example where the controller will connect directly to the appliance.
 
