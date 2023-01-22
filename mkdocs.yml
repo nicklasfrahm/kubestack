@@ -25,6 +25,6 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Management:
-      - Overview: management/index.md
+      - Overview: management.md
       - SSH: management/ssh.md
   - Networking: networking.md

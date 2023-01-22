@@ -1,10 +1,6 @@
 # Kubestack ♻️
 
-Kubestack is an infrastructure orchestrator built on of Kubernetes.
-
-## Description
-
-Kubestack aims to provide a cloud-like experience for managing infrastructure using Kubernetes as a control plane.
+Kubestack is a infrastructure orchestrator built on top of Kubernetes. The goal is to provide APIs to build private clouds using Kubernetes as a control plane and API. You may find more information in the documentation at [kubestack.nicklasfrahm.dev][docs-kubestack].
 
 ## Getting Started
 
@@ -115,3 +111,5 @@ More information can be found via the [Kubebuilder Documentation](https://book.k
 ## License
 
 This projects is licensed under the terms of the [MIT license](./LICENSE.md).
+
+[docs-kubestack]: https://kubestack.nicklasfrahm.dev

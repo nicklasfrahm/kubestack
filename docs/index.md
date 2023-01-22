@@ -4,7 +4,7 @@ Kubestack is a infrastructure orchestrator built on top of Kubernetes. The goal 
 
 ## Overview
 
-- [**Management**](./management/index.md)  
+- [**Management**](./management.md)  
   As Kubestack is built on top of **bare-metal infrastructure**, it requires foundational management APIs to connect to existing infrastructure, such as network appliances.
 
 - [**Networking**](./networking.md)  

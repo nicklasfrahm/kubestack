@@ -6,7 +6,7 @@ This section describes how to connect to existing appliances to manage them.
 
 To configure the remote management of an appliance, you need to create a `Connection`, which defines a management protocol and a reference to a `Secret` that contains the credentials to connect to the appliance. As the authentication methods for each protocol vary, so do the supported keys in the `Secret` based on the mangement protocol. Learn more about the configuration of a `Connection` for a supported management protocol and the structure of the corresponding `Secret` by following the links below.
 
-- [`SSH`](./ssh.md)
+- [`SSH`](./management/ssh.md)
 
 ## Troubleshooting
 
