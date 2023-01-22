@@ -17,6 +17,15 @@ type Client struct {
 	conn *v1alpha1.Connection
 	ssh  *sshx.Client
 	kube client.Client
+	os   *v1alpha1.OSInfo
+}
+
+// NewClientFromConnection creates a new client from a connection.
+func NewClientFromConnection(client client.Client, conn *v1alpha1.Connection) (*Client, error) {
+	return &Client{
+		conn: conn,
+		kube: client,
+	}, nil
 }
 
 // Connect connects to the host.
@@ -106,16 +115,11 @@ func (c *Client) ProbeOS() (*v1alpha1.OSInfo, error) {
 		return nil, fmt.Errorf("failed to parse OS version from file: %s", osReleaseFile)
 	}
 
-	return &v1alpha1.OSInfo{
+	// Store the result internally for later use.
+	c.os = &v1alpha1.OSInfo{
 		Name:    osNameKey.MustString("Unknown"),
 		Version: osVersionKey.MustString("Unknown"),
-	}, nil
-}
+	}
 
-// NewClientFromConnection creates a new client from a connection.
-func NewClientFromConnection(client client.Client, conn *v1alpha1.Connection) (*Client, error) {
-	return &Client{
-		conn: conn,
-		kube: client,
-	}, nil
+	return c.os, nil
 }
