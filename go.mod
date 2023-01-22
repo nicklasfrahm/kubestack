@@ -3,7 +3,6 @@ module github.com/nicklasfrahm/kubestack
 go 1.19
 
 require (
-	github.com/gosnmp/gosnmp v1.35.0
 	github.com/nicklasfrahm/k3se v1.2.1
 	github.com/onsi/ginkgo/v2 v2.7.0
 	github.com/onsi/gomega v1.25.0
