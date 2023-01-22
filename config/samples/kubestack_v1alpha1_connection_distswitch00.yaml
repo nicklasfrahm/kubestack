@@ -1,0 +1,18 @@
+apiVersion: kubestack.nicklasfrahm.dev/v1alpha1
+kind: Connection
+metadata:
+  labels:
+    app.kubernetes.io/name: connection
+    app.kubernetes.io/instance: distswitch00
+    app.kubernetes.io/part-of: kubestack
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kubestack
+  name: distswitch00
+spec:
+  protocol: SSH
+  host: 10.0.10.101
+  ssh:
+    fingerprint: SHA256:W7ISJgSm3sDgH2Iv6FFAhhKz+Ps0VtLgSMqrlLsq1ro
+    user: admin
+  secretRef:
+    name: connection-distswitch00

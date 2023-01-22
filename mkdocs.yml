@@ -15,7 +15,16 @@ theme:
   - navigation.tabs.sticky
   - navigation.expand
   - navigation.top
+  - content.code.copy
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 nav:
   - Overview: index.md
-  - Management: management.md
+  - Management:
+      - Overview: management/index.md
+      - SSH: management/ssh.md
   - Networking: networking.md

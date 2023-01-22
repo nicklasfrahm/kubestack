@@ -49,6 +49,12 @@ spec:
           spec:
             description: ConnectionSpec defines the desired state of Connection
             properties:
+              host:
+                description: Host is the host to connect to.
+                type: string
+              port:
+                description: Port is the port to connect to.
+                type: integer
               protocol:
                 description: Protocol is the protocol used to connect to the host.
                 enum:
@@ -68,7 +74,40 @@ spec:
                     type: string
                 type: object
                 x-kubernetes-map-type: atomic
+              ssh:
+                description: SSH contains additional SSH connection options.
+                properties:
+                  fingerprint:
+                    description: Fingerprint is the SSH host key fingerprint in the
+                      format "<algorithm>:<hash>".
+                    type: string
+                  ignoreFingerprintInsecure:
+                    description: IgnoreFingerprint is a flag to ignore the fingerprint
+                      check.
+                    type: boolean
+                  proxyFingerprint:
+                    description: ProxyFingerprint is the SSH proxy host key fingerprint
+                      in the format "<algorithm>:<hash>".
+                    type: string
+                  proxyHost:
+                    description: ProxyHost is the SSH proxy host to connect to.
+                    type: string
+                  proxyIgnoreFingerprintInsecure:
+                    description: ProxyIgnoreFingerprintInsecure is a flag to ignore
+                      the proxy fingerprint check.
+                    type: boolean
+                  proxyPort:
+                    description: ProxyPort is the SSH proxy port to connect to.
+                    type: integer
+                  proxyUser:
+                    description: ProxyUser is the SSH proxy user to connect as.
+                    type: string
+                  user:
+                    description: User is the SSH user to connect as.
+                    type: string
+                type: object
             required:
+            - host
             - protocol
             - secretRef
             type: object

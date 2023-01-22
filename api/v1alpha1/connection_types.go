@@ -37,6 +37,22 @@ type OSInfo struct {
 	Version string `json:"version"`
 }
 
+// ConnectionSpecSSHOptions defines the SSH connection options.
+type ConnectionSpecSSHOptions struct {
+	// Fingerprint is the SSH host key fingerprint in the format "<algorithm>:<hash>".
+	Fingerprint string `json:"fingerprint,omitempty"`
+	// User is the SSH user to connect as.
+	User string `json:"user,omitempty"`
+	// ProxyHost is the SSH proxy host to connect to.
+	ProxyHost string `json:"proxyHost,omitempty"`
+	// ProxyPort is the SSH proxy port to connect to.
+	ProxyPort int `json:"proxyPort,omitempty"`
+	// ProxyFingerprint is the SSH proxy host key fingerprint in the format "<algorithm>:<hash>".
+	ProxyFingerprint string `json:"proxyFingerprint,omitempty"`
+	// ProxyUser is the SSH proxy user to connect as.
+	ProxyUser string `json:"proxyUser,omitempty"`
+}
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -45,10 +61,20 @@ type ConnectionSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
+	// Host is the host to connect to.
+	//+kubebuilder:validation:Required
+	Host string `json:"host"`
+
+	// Port is the port to connect to.
+	Port int `json:"port,omitempty"`
+
 	// Protocol is the protocol used to connect to the host.
 	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum=SSH
 	Protocol Protocol `json:"protocol"`
+
+	// SSH contains additional SSH connection options.
+	SSH ConnectionSpecSSHOptions `json:"ssh,omitempty"`
 
 	// SecretRef is the reference to a secret containing sensitive connection credentials.
 	//+kubebuilder:validation:Required

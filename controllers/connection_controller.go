@@ -18,7 +18,7 @@ package controllers
 
 import (
 	"context"
-	"strings"
+	"fmt"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -29,7 +29,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	kubestackv1alpha1 "github.com/nicklasfrahm/kubestack/api/v1alpha1"
-	"github.com/nicklasfrahm/kubestack/pkg/util"
+	"github.com/nicklasfrahm/kubestack/pkg/management"
+	"github.com/nicklasfrahm/kubestack/pkg/management/ssh"
 )
 
 // ConnectionReconciler reconciles a Connection object
@@ -57,24 +58,35 @@ func (r *ConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	_ = log.FromContext(ctx)
 
 	conn := new(kubestackv1alpha1.Connection)
-	if err := r.Client.Get(ctx, req.NamespacedName, conn); err != nil {
+	err := r.Client.Get(ctx, req.NamespacedName, conn)
+	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	secret := new(corev1.Secret)
-	if err := r.Client.Get(ctx, client.ObjectKey{
-		Namespace: conn.Spec.SecretRef.Namespace,
-		Name:      conn.Spec.SecretRef.Name,
-	}, secret); err != nil {
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+	var mgmt management.Client
+	switch conn.Spec.Protocol {
+	case kubestackv1alpha1.ProtocolSSH:
+		mgmt, err = ssh.NewClientFromConnection(r.Client, conn)
+		if err != nil {
+			return ctrl.Result{}, client.IgnoreNotFound(err)
+		}
+		// TODO: Add support for SNMP.
+	default:
+		return ctrl.Result{}, fmt.Errorf("unknown protocol %q", conn.Spec.Protocol)
 	}
+
+	if err := mgmt.Connect(); err != nil {
+		r.recorder.Event(conn, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
+		return ctrl.Result{
+			RequeueAfter: 15 * time.Second,
+		}, err
+	}
+	defer mgmt.Disconnect()
 
 	// Update the connection status with the OS information.
-	osInfo, err := util.ProbeOS(conn, secret)
+	osInfo, err := mgmt.ProbeOS()
 	if err != nil {
-		if strings.HasPrefix(err.Error(), "ssh:") {
-			r.recorder.Event(conn, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
-		}
+		r.recorder.Event(conn, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
 		return ctrl.Result{
 			RequeueAfter: 15 * time.Second,
 		}, err

@@ -1,0 +1,32 @@
+apiVersion: kubestack.nicklasfrahm.dev/v1alpha1
+kind: Connection
+metadata:
+  labels:
+    app.kubernetes.io/name: connection
+    app.kubernetes.io/instance: alfa
+    app.kubernetes.io/part-of: kubestack
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kubestack
+  name: alfa
+spec:
+  protocol: SSH
+  host: 172.16.0.254
+  # (optional) Specify a port. Defaults to 22 for SSH.
+  # port: 22
+  ssh:
+    fingerprint: SHA256:GxNvyufD71QuCnH04eNp3LzCGuTV+ookFzVGUtlWvCI
+    # (optional) Specify a user. Defaults to root.
+    user: nicklasfrahm
+    # (optional) Specify a proxy host. Defaults to none.
+    # Setting this will enable the usage of a jump host.
+    proxyHost: alfa.nicklasfrahm.xyz
+    # (optional) Specify a port. Defaults to 22.
+    # proxyPort: 22
+    proxyFingerprint: SHA256:GxNvyufD71QuCnH04eNp3LzCGuTV+ookFzVGUtlWvCI
+    # (optional) Specify a user. Defaults to root.
+    proxyUser: nicklasfrahm
+  secretRef:
+    name: connection-alfa
+    # (optional) Specify the namespace. Defaults
+    # to the namespace of the Connection resource.
+    # namespace: default
