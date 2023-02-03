@@ -4,8 +4,8 @@ site_url: https://kubestack.nicklasfrahm.dev/
 repo_url: https://github.com/nicklasfrahm/kubestack
 repo_name: nicklasfrahm/kubestack
 edit_uri: edit/main/docs/
-strict: yes
-use_directory_urls: no
+strict: true
+use_directory_urls: false
 theme:
   name: material
   features:
@@ -29,4 +29,6 @@ nav:
   - Management:
       - Overview: management.md
       - SSH: management/ssh.md
-  - Networking: networking.md
+  - Networking:
+      - Overview: networking.md
+      - Interfaces: networking/interfaces.md

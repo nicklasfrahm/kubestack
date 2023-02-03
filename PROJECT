@@ -13,4 +13,13 @@ resources:
   kind: Connection
   path: github.com/nicklasfrahm/kubestack/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: nicklasfrahm.dev
+  group: kubestack
+  kind: Interface
+  path: github.com/nicklasfrahm/kubestack/api/v1alpha1
+  version: v1alpha1
 version: "3"

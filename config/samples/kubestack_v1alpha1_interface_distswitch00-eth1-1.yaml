@@ -1,0 +1,51 @@
+apiVersion: kubestack.nicklasfrahm.dev/v1alpha1
+kind: Interface
+metadata:
+  labels:
+    app.kubernetes.io/name: interface
+    app.kubernetes.io/instance: distswitch00-eth1-1
+    app.kubernetes.io/part-of: kubestack
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kubestack
+  name: distswitch00-eth1-1
+spec:
+  # (required) Configure the connection.
+  connectionRef:
+    # (required) The name of the Connection resource.
+    name: distswitch00
+    # (optional) Specify the namespace. Defaults
+    # to the namespace of the Connection resource.
+    # namespace: default
+  # (required) Specify an interface selector.
+  selector:
+    # (optional) The name of the interface.
+    name: eth1/1
+    # (optional) The MAC address of the interface.
+    # mac: 00:00:00:00:00:00
+  # (optional) Override the interface name.
+  # This may not be supported by all appliances.
+  # name: eth1x01
+  # (required) Specify the interface type.
+  type: EthernetCSMACD
+  # (optional) Specify the interface MTU.
+  # mtu: 1500
+  # (optional) Specify the interface description.
+  description: Internet towards ISP.
+  # (optional) Enable or disable the interface.
+  enabled: true
+  # (optional) Specify additional ethernet configuration.
+  ethernet:
+    # (optional) Override the system-assigned MAC address.
+    # macAddress: 00:00:00:00:00:00
+    # (optional) Enable or disable auto-negotiation.
+    autoNegotiate: true
+    # (optional) Force the duplex mode.
+    # duplexMode: Full
+    # (optional) Force the speed.
+    # portSpeed: 1Gbps
+    # (optional) Configure switched VLANs.
+    switchedVLAN:
+      # (required) Configure the VLAN mode.
+      mode: Access
+      # (required) Configure the access VLAN ID.
+      accessVLAN: 5

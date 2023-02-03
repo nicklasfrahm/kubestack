@@ -9,11 +9,15 @@ metadata:
     app.kubernetes.io/created-by: kubestack
   name: alfa
 spec:
+  # (required) The protocol to use for the connection.
   protocol: SSH
+  # (required) The network address of the appliance.
   host: 172.16.0.254
   # (optional) Specify a port. Defaults to 22 for SSH.
   # port: 22
+  # Configure options specific to the SSH protocol.
   ssh:
+    # (optional) Configure the host key fingerprint to prevent PitM attacks.
     fingerprint: SHA256:GxNvyufD71QuCnH04eNp3LzCGuTV+ookFzVGUtlWvCI
     # (optional) Specify a user. Defaults to root.
     user: nicklasfrahm
@@ -25,7 +29,9 @@ spec:
     proxyFingerprint: SHA256:GxNvyufD71QuCnH04eNp3LzCGuTV+ookFzVGUtlWvCI
     # (optional) Specify a user. Defaults to root.
     proxyUser: nicklasfrahm
+  # (required) Configure the credentials.
   secretRef:
+    # The name of the secret that contains the credentials.
     name: connection-alfa
     # (optional) Specify the namespace. Defaults
     # to the namespace of the Connection resource.

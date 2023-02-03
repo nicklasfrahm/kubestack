@@ -9,10 +9,17 @@ metadata:
     app.kubernetes.io/created-by: kubestack
   name: distswitch00
 spec:
+  # (required) The protocol to use for the connection.
   protocol: SSH
+  # (required) The network address of the appliance.
   host: 10.0.10.101
+  # Configure options specific to the SSH protocol.
   ssh:
+    # (optional) Configure the host key fingerprint to prevent PitM attacks.
     fingerprint: SHA256:W7ISJgSm3sDgH2Iv6FFAhhKz+Ps0VtLgSMqrlLsq1ro
+    # (optional) Specify a user. Defaults to root.
     user: admin
+  # (required) Configure the credentials.
   secretRef:
+    # (required) The name of the secret that contains the credentials.
     name: connection-distswitch00

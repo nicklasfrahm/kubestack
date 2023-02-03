@@ -1,0 +1,31 @@
+# permissions for end users to edit interfaces.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: interface-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: kubestack
+    app.kubernetes.io/part-of: kubestack
+    app.kubernetes.io/managed-by: kustomize
+  name: interface-editor-role
+rules:
+- apiGroups:
+  - kubestack.nicklasfrahm.dev
+  resources:
+  - interfaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kubestack.nicklasfrahm.dev
+  resources:
+  - interfaces/status
+  verbs:
+  - get

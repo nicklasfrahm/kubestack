@@ -1,0 +1,194 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.10.0
+  creationTimestamp: null
+  name: interfaces.kubestack.nicklasfrahm.dev
+spec:
+  group: kubestack.nicklasfrahm.dev
+  names:
+    categories:
+    - all
+    kind: Interface
+    listKind: InterfaceList
+    plural: interfaces
+    shortNames:
+    - if
+    singular: interface
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Interface is the Schema for the interfaces API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: InterfaceSpec defines the desired state of Interface
+            properties:
+              connectionRef:
+                description: ConnectionRef is the reference to the connection that
+                  this interface is associated with.
+                properties:
+                  name:
+                    description: Name of the connection.
+                    type: string
+                  namespace:
+                    description: Namespace of the connection.
+                    type: string
+                required:
+                - name
+                type: object
+              description:
+                description: Description provides human-readable information about
+                  the interface.
+                pattern: ^[a-zA-Z0-9 ]{1,255}$
+                type: string
+              enabled:
+                description: Enabled specifies whether the interface is enabled.
+                type: boolean
+              ethernet:
+                description: Ethernet configures the Ethernet-specific properties
+                  of the interface.
+                properties:
+                  autoNegotiate:
+                    description: AutoNegotiate specifies whether auto-negotiation
+                      is enabled.
+                    type: boolean
+                  duplexMode:
+                    description: Duplex mode configures the duplex mode being advertised
+                      by the interface. When auto-negotiate is TRUE, this optionally
+                      sets the duplex mode that will be advertised to the peer. If
+                      unspecified, the interface should negotiate the duplex mode
+                      directly (typically full-duplex). When auto-negotiate is FALSE,
+                      this sets the duplex mode on the interface directly.
+                    enum:
+                    - Half
+                    - Full
+                    type: string
+                  macAddress:
+                    description: MACAddress allows to override the system-assigned
+                      address of the interface.
+                    pattern: ^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$
+                    type: string
+                  portSpeed:
+                    description: PortSpeed configures the port speed being advertised
+                      by the interface. When auto-negotiate is TRUE, this optionally
+                      sets the port-speed mode that will be advertised to the peer
+                      for negotiation. If unspecified, it is expected that the interface
+                      will select the highest speed available based on negotiation.
+                      When auto-negotiate is set to FALSE, sets the link speed to
+                      a fixed value.
+                    type: string
+                  switchedVLAN:
+                    description: SwitchedVLAN specifies the VLAN configuration of
+                      the interface.
+                    properties:
+                      accessVLAN:
+                        description: AccessVLAN is the access VLAN.
+                        type: integer
+                      interfaceMode:
+                        description: InterfaceMode is the VLAN mode.
+                        type: string
+                      nativeVLAN:
+                        description: NativeVLAN is the native VLAN.
+                        type: integer
+                      trunkVLANs:
+                        description: TrunkVLANs is the list of trunk VLANs.
+                        items:
+                          description: VLANID is the ID of the VLAN.
+                          type: integer
+                        type: array
+                    type: object
+                type: object
+              mtu:
+                description: MTU specifies the maximum transmission unit of the interface.
+                type: integer
+              name:
+                description: Name allows to override the interface name.
+                type: string
+              routedVLAN:
+                description: RoutedVLAN specifies the VLAN configuration of the interface.
+                properties:
+                  ipv4:
+                    description: IPv4 configures the IPv4 address of the interface.
+                    properties:
+                      addresses:
+                        description: Addresses is the list of IPv4 addresses assigned
+                          to the interface.
+                        items:
+                          description: IPv4IP is the IPv4 address configuration of
+                            an interface.
+                          properties:
+                            ip:
+                              description: Address is the IPv4 address.
+                              type: string
+                            prefixLength:
+                              description: PrefixLength is the prefix length of the
+                                IPv4 address.
+                              type: integer
+                          type: object
+                        type: array
+                      dhcpClient:
+                        description: DHCPClient enables DHCP client on the interface.
+                        type: boolean
+                      neighbors:
+                        description: Neighbors is the list of IPv4 neighbors.
+                        items:
+                          description: IPv4Neighbor is an IPv4 neighbor.
+                          properties:
+                            ip:
+                              description: IP is the IPv4 address of the neighbor.
+                              type: string
+                            linkLayerAddress:
+                              description: 'LinkLayerAddress is the link layer address
+                                of the neighbor. TODO: Implement physical address
+                                type and use it here.'
+                              type: string
+                          type: object
+                        type: array
+                    type: object
+                  vlan:
+                    description: VLANID is the VLAN ID of the routed VLAN.
+                    type: integer
+                type: object
+              selector:
+                description: Selector allows to select the interface based on certain
+                  criteria.
+                properties:
+                  macAddress:
+                    description: MACAddress is the MAC address of the interface.
+                    type: string
+                  name:
+                    description: Name is the name of the interface.
+                    type: string
+                type: object
+              type:
+                description: Type specifies the type of the interface.
+                enum:
+                - EthernetCSMACD
+                type: string
+            required:
+            - type
+            type: object
+          status:
+            description: InterfaceStatus defines the observed state of Interface
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

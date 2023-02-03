@@ -53,14 +53,8 @@ type ConnectionSpecSSHOptions struct {
 	ProxyUser string `json:"proxyUser,omitempty"`
 }
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // ConnectionSpec defines the desired state of Connection
 type ConnectionSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// Host is the host to connect to.
 	//+kubebuilder:validation:Required
 	Host string `json:"host"`
@@ -83,9 +77,6 @@ type ConnectionSpec struct {
 
 // ConnectionStatus defines the observed state of Connection
 type ConnectionStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
 	// OS contains information about the discovered operating system of the system.
 	OS OSInfo `json:"os,omitempty"`
 }

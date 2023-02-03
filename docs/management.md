@@ -16,8 +16,6 @@ If a `Connection` is successfully created, the controller will probe for the ope
 kubectl get conn
 ```
 
-Below you may find an example of what the output may look like.
-
 ```text
 NAME           PROTOCOL   OS-NAME   OS-VERSION
 alfa           SSH        Ubuntu    22.04
@@ -33,8 +31,6 @@ kubectl get event \
   --field-selector involvedObject.kind=Connection \
   --field-selector involvedObject.name=alfa
 ```
-
-Below you may find an example of the event log for a `Connection` that is not able to connect to an appliance.
 
 ```text
 LAST SEEN   TYPE      REASON             OBJECT            MESSAGE

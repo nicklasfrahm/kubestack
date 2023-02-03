@@ -81,10 +81,6 @@ spec:
                     description: Fingerprint is the SSH host key fingerprint in the
                       format "<algorithm>:<hash>".
                     type: string
-                  ignoreFingerprintInsecure:
-                    description: IgnoreFingerprint is a flag to ignore the fingerprint
-                      check.
-                    type: boolean
                   proxyFingerprint:
                     description: ProxyFingerprint is the SSH proxy host key fingerprint
                       in the format "<algorithm>:<hash>".
@@ -92,10 +88,6 @@ spec:
                   proxyHost:
                     description: ProxyHost is the SSH proxy host to connect to.
                     type: string
-                  proxyIgnoreFingerprintInsecure:
-                    description: ProxyIgnoreFingerprintInsecure is a flag to ignore
-                      the proxy fingerprint check.
-                    type: boolean
                   proxyPort:
                     description: ProxyPort is the SSH proxy port to connect to.
                     type: integer
