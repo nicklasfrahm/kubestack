@@ -50,9 +50,7 @@ spec:
       # (optional) Configure the VLAN ID of untagged
       # frames arriving at this port. Defaults to 1.
       nativeVLAN: 9
-      # (optional) Configure the access VLAN ID.
-      # accessVLAN: 5
-      # (optional) Configure the trunk VLAN IDs.
+      # (required) Configure the trunk VLAN IDs.
       trunkVLANs:
       - 5
       - 9
