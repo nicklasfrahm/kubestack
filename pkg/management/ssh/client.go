@@ -6,10 +6,12 @@ import (
 
 	"gopkg.in/ini.v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/nicklasfrahm/k3se/pkg/sshx"
 	"github.com/nicklasfrahm/kubestack/api/v1alpha1"
+	"github.com/nicklasfrahm/kubestack/pkg/management/common"
 )
 
 // Client manages an appliance using SSH.
@@ -20,29 +22,36 @@ type Client struct {
 	os   *v1alpha1.OSInfo
 }
 
-// NewClientFromConnection creates a new client from a connection.
-func NewClientFromConnection(client client.Client, conn *v1alpha1.Connection) (*Client, error) {
+// NewClient creates a new client from a connection.
+func NewClient(conn *v1alpha1.Connection, options ...common.Option) (common.Client, error) {
+	opts, err := common.GetDefaultOptions().Apply(options...)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Client{
 		conn: conn,
-		kube: client,
+		kube: opts.KubernetesClient,
 	}, nil
 }
 
 // Connect connects to the host.
 func (c *Client) Connect() error {
 	// Fetch credentials from secret.
-	namespace := c.conn.Spec.SecretRef.Namespace
-	if namespace == "" {
-		namespace = c.conn.ObjectMeta.Namespace
+	secretRef := types.NamespacedName{
+		Namespace: c.conn.Spec.SecretRef.Namespace,
+		Name:      c.conn.Spec.SecretRef.Name,
+	}
+	if secretRef.Namespace == "" {
+		secretRef.Namespace = c.conn.ObjectMeta.Namespace
 	}
 
 	secret := new(corev1.Secret)
-	err := c.kube.Get(context.TODO(), client.ObjectKey{
-		Namespace: namespace,
-		Name:      c.conn.Spec.SecretRef.Name,
-	}, secret)
+	err := c.kube.Get(context.TODO(), secretRef, secret)
 	if err != nil {
-		// TODO: Signal user if secret does not exist.
+		if client.IgnoreNotFound(err) == nil {
+			return fmt.Errorf("failed to read Secret: %s/%s", secretRef.Namespace, secretRef.Name)
+		}
 		return err
 	}
 

@@ -18,7 +18,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -28,9 +27,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	kubestackv1alpha1 "github.com/nicklasfrahm/kubestack/api/v1alpha1"
+	"github.com/nicklasfrahm/kubestack/api/v1alpha1"
 	"github.com/nicklasfrahm/kubestack/pkg/management"
-	"github.com/nicklasfrahm/kubestack/pkg/management/ssh"
+	"github.com/nicklasfrahm/kubestack/pkg/management/common"
 )
 
 // ConnectionReconciler reconciles a Connection object
@@ -57,25 +56,14 @@ type ConnectionReconciler struct {
 func (r *ConnectionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	conn := new(kubestackv1alpha1.Connection)
-	err := r.Client.Get(ctx, req.NamespacedName, conn)
+	conn := new(v1alpha1.Connection)
+	err := r.Get(ctx, req.NamespacedName, conn)
 	if err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	var mgmt management.Client
-	switch conn.Spec.Protocol {
-	case kubestackv1alpha1.ProtocolSSH:
-		mgmt, err = ssh.NewClientFromConnection(r.Client, conn)
-		if err != nil {
-			return ctrl.Result{}, client.IgnoreNotFound(err)
-		}
-		// TODO: Add support for SNMP.
-	default:
-		return ctrl.Result{}, fmt.Errorf("unknown protocol %q", conn.Spec.Protocol)
-	}
-
-	if err := mgmt.Connect(); err != nil {
+	mgmt, err := management.NewClient(req.NamespacedName, common.WithKubernetesClient(r.Client))
+	if err != nil {
 		r.recorder.Event(conn, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
 		return ctrl.Result{
 			RequeueAfter: 15 * time.Second,
@@ -109,6 +97,6 @@ func (r *ConnectionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.recorder = mgr.GetEventRecorderFor("connection-controller")
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kubestackv1alpha1.Connection{}).
+		For(&v1alpha1.Connection{}).
 		Complete(r)
 }

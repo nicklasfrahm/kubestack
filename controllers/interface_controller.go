@@ -20,11 +20,14 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	kubestackv1alpha1 "github.com/nicklasfrahm/kubestack/api/v1alpha1"
+	"github.com/nicklasfrahm/kubestack/api/v1alpha1"
+	"github.com/nicklasfrahm/kubestack/pkg/management"
+	"github.com/nicklasfrahm/kubestack/pkg/management/common"
 )
 
 // InterfaceReconciler reconciles a Interface object
@@ -49,6 +52,27 @@ type InterfaceReconciler struct {
 func (r *InterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
+	iface := new(v1alpha1.Interface)
+	err := r.Client.Get(ctx, req.NamespacedName, iface)
+	if err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	connRef := types.NamespacedName{
+		Namespace: iface.Spec.ConnectionRef.Namespace,
+		Name:      iface.Spec.ConnectionRef.Name,
+	}
+	if connRef.Namespace == "" {
+		connRef.Namespace = req.Namespace
+	}
+
+	mgmt, err := management.NewClient(connRef, common.WithKubernetesClient(r.Client))
+	if err != nil {
+		// TODO: Log failed connection in event recorder.
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+	defer mgmt.Disconnect()
+
 	// TODO(user): CONTINUE HERE.
 
 	return ctrl.Result{}, nil
@@ -56,7 +80,9 @@ func (r *InterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *InterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// TODO: Create event recorder.
+
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kubestackv1alpha1.Interface{}).
+		For(&v1alpha1.Interface{}).
 		Complete(r)
 }
