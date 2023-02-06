@@ -1,6 +1,6 @@
 REGISTRY	:= ghcr.io
 REPO		:= nicklasfrahm/kubestack
-TARGET		:= zonec
+TARGET		?= zonec
 SOURCES		:= $(shell find . -name "*.go")
 PLATFORM	?= $(shell go version | cut -d " " -f 4)
 GOOS		:= $(shell echo $(PLATFORM) | cut -d "/" -f 1)
@@ -12,6 +12,8 @@ BUILD_FLAGS	:= -ldflags="-s -w -X main.version=$(VERSION)"
 ifeq ($(GOOS),windows)
 SUFFIX	= $(GOOS)-$(GOARCH).exe
 endif
+
+BINARY		?= bin/$(TARGET)-$(SUFFIX)
 
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
@@ -78,7 +80,7 @@ build: bin/$(TARGET)-$(SUFFIX)
 
 bin/$(TARGET)-$(SUFFIX): $(SOURCES)
 	@mkdir -p $(@D)
-	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_FLAGS) -o $@ cmd/$(TARGET)/main.go
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_FLAGS) -o $(BINARY) cmd/$(TARGET)/main.go
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
@@ -91,7 +93,7 @@ docker:
 	  -t $(TARGET):$(VERSION) \
 	  -t $(REGISTRY)/$(REPO)-$(TARGET):latest \
 	  -t $(REGISTRY)/$(REPO)-$(TARGET):$(VERSION) \
-	  --build-arg BINARY=$(TARGET)-$(SUFFIX) \
+	  --build-arg TARGET=$(TARGET) \
 	  --build-arg VERSION=$(VERSION) \
 	  -f build/package/Dockerfile .
 

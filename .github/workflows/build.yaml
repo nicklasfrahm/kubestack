@@ -1,4 +1,4 @@
-name: Build
+name: build
 
 on:
   workflow_dispatch:
@@ -25,6 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        target:
+          - zonec
         platform:
           - linux/amd64
           - linux/arm64
@@ -46,6 +48,9 @@ jobs:
           go-version-file: go.mod
           check-latest: true
 
+      - name: Download dependencies
+        run: go mod download
+
       - name: Fetch version from git history
         if: github.ref_protected == true
         uses: codfish/semantic-release-action@v2
@@ -57,7 +62,11 @@ jobs:
 
       - name: Build binary
         if: github.ref_protected == true
-        run: VERSION=v${{ steps.semantic.outputs.release-version }} PLATFORM=${{ matrix.platform }} make build
+        run: |
+          TARGET=${{ matrix.target }} \
+          VERSION=v${{ steps.semantic.outputs.release-version }} \
+          PLATFORM=${{ matrix.platform }} \
+          make build
 
   container:
     name: Container
@@ -125,6 +134,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ steps.semantic.outputs.new-release-published }}
           build-args: |
+            TARGET=${{ matrix.target }}
             VERSION=v${{ steps.semantic.outputs.release-version }}
 
   auto-merge:

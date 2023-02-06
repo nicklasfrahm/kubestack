@@ -1,6 +1,6 @@
 FROM golang:1.20 AS build
 ARG VERSION
-ARG BINARY
+ARG TARGET
 
 WORKDIR /app
 COPY go.* ./
@@ -11,11 +11,10 @@ ADD cmd/ cmd/
 ADD api/ api/
 ADD pkg/ pkg/
 ADD controllers/ controllers/
-RUN VERSION=$VERSION make bin/$BINARY \
-  && mv bin/$BINARY app
+RUN TARGET=$TARGET VERSION=$VERSION BINARY=controller make build
 
 FROM gcr.io/distroless/base:nonroot AS run
 WORKDIR /
-COPY --from=build /app/app .
+COPY --from=build /app/controller .
 USER 65532:65532
-ENTRYPOINT [ "/app" ]
+ENTRYPOINT [ "/controller" ]
