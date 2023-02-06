@@ -1,3 +1,17 @@
+REGISTRY	:= ghcr.io
+REPO		:= nicklasfrahm/kubestack
+TARGET		:= zonec
+SOURCES		:= $(shell find . -name "*.go")
+PLATFORM	?= $(shell go version | cut -d " " -f 4)
+GOOS		:= $(shell echo $(PLATFORM) | cut -d "/" -f 1)
+GOARCH		:= $(shell echo $(PLATFORM) | cut -d "/" -f 2)
+SUFFIX		:= $(GOOS)-$(GOARCH)
+VERSION		?= $(shell git describe --always --tags --dirty)
+BUILD_FLAGS	:= -ldflags="-s -w -X main.version=$(VERSION)"
+
+ifeq ($(GOOS),windows)
+SUFFIX	= $(GOOS)-$(GOARCH).exe
+endif
 
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
@@ -60,20 +74,26 @@ test: manifests generate fmt vet envtest ## Run tests.
 
 ##@ Build
 
-.PHONY: build
-build: manifests generate fmt vet ## Build manager binary.
-	go build -o bin/manager main.go
+build: bin/$(TARGET)-$(SUFFIX)
+
+bin/$(TARGET)-$(SUFFIX): $(SOURCES)
+	@mkdir -p $(@D)
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(BUILD_FLAGS) -o $@ cmd/$(TARGET)/main.go
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run ./main.go
+	go run $(BUILD_FLAGS) ./cmd/$(TARGET)/main.go
 
-# If you wish built the manager image targeting other platforms you can use the --platform flag.
-# (i.e. docker build --platform linux/arm64 ). However, you must enable docker buildKit for it.
-# More info: https://docs.docker.com/develop/develop-images/build_enhancements/
-.PHONY: docker-build
-docker-build: test ## Build docker image with the manager.
-	docker build -t ${IMG} .
+.PHONY: docker
+docker:
+	docker build \
+	  -t $(TARGET):latest \
+	  -t $(TARGET):$(VERSION) \
+	  -t $(REGISTRY)/$(REPO)-$(TARGET):latest \
+	  -t $(REGISTRY)/$(REPO)-$(TARGET):$(VERSION) \
+	  --build-arg BINARY=$(TARGET)-$(SUFFIX) \
+	  --build-arg VERSION=$(VERSION) \
+	  -f build/package/Dockerfile .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.

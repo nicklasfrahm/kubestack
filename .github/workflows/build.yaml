@@ -1,0 +1,153 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_IMAGE: ghcr.io/${{ github.repository }}
+  CONTAINER_PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  binaries:
+    name: Binaries
+    # pull_request_target: Only "dependabot[bot]" is allowed to access secrets.
+    # pull_request: All other forks are running without access to secrets.
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') ||
+      (github.event_name != 'pull_request_target' && github.actor != 'dependabot[bot]')
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+    steps:
+      - name: Clone repository
+        if: ${{ github.event_name != 'pull_request_target' }}
+        uses: actions/checkout@v3
+
+        # Allow "dependabot[bot]" to verify its changes with access to secrets and modified code.
+      - name: Clone repository for Dependabot
+        if: ${{ github.event_name == 'pull_request_target' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Go compiler
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Fetch version from git history
+        if: github.ref_protected == true
+        uses: codfish/semantic-release-action@v2
+        id: semantic
+        with:
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build binary
+        if: github.ref_protected == true
+        run: VERSION=v${{ steps.semantic.outputs.release-version }} PLATFORM=${{ matrix.platform }} make build
+
+  container:
+    name: Container
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') ||
+      (github.event_name != 'pull_request_target' && github.actor != 'dependabot[bot]')
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - zonec
+    steps:
+      - name: Clone repository
+        if: ${{ github.event_name != 'pull_request_target' }}
+        uses: actions/checkout@v3
+
+        # Allow "dependabot[bot]" to verify its changes with access to secrets and modified code.
+      - name: Clone repository for Dependabot
+        if: ${{ github.event_name == 'pull_request_target' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Fetch version from git history
+        uses: codfish/semantic-release-action@v2
+        id: semantic
+        with:
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate container metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.CONTAINER_IMAGE }}-${{ matrix.target }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=v${{ steps.semantic.outputs.release-version }},enable=${{ steps.semantic.outputs.new-release-published }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v3
+        with:
+          file: build/package/Dockerfile
+          cache-from: type=registry,ref=${{ env.CONTAINER_IMAGE }}-${{ matrix.target }}:main
+          cache-to: type=inline
+          platforms: ${{ env.CONTAINER_PLATFORMS }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ steps.semantic.outputs.new-release-published }}
+          build-args: |
+            VERSION=v${{ steps.semantic.outputs.release-version }}
+
+  auto-merge:
+    name: Auto-merge
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    needs: [binaries, container]
+    steps:
+      - uses: ahmadnassri/action-dependabot-auto-merge@v2
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          target: all
+
+  release:
+    name: Release
+    if: github.ref_protected == true && github.event_name == 'push'
+    needs: [binaries, container]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      - name: Create release
+        uses: codfish/semantic-release-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
