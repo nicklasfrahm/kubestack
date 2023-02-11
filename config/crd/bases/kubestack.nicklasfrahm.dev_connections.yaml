@@ -47,7 +47,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: ConnectionSpec defines the desired state of Connection
+            description: ConnectionSpec defines the desired state of Connection.
             properties:
               host:
                 description: Host is the host to connect to.
@@ -57,6 +57,7 @@ spec:
                 type: integer
               protocol:
                 description: Protocol is the protocol used to connect to the host.
+                  Currently only supports `SSH`.
                 enum:
                 - SSH
                 type: string
@@ -79,11 +80,11 @@ spec:
                 properties:
                   fingerprint:
                     description: Fingerprint is the SSH host key fingerprint in the
-                      format "<algorithm>:<hash>".
+                      format `{algorithm}:{hash}`.
                     type: string
                   proxyFingerprint:
                     description: ProxyFingerprint is the SSH proxy host key fingerprint
-                      in the format "<algorithm>:<hash>".
+                      in the format `{algorithm}:{hash}`.
                     type: string
                   proxyHost:
                     description: ProxyHost is the SSH proxy host to connect to.
@@ -104,11 +105,11 @@ spec:
             - secretRef
             type: object
           status:
-            description: ConnectionStatus defines the observed state of Connection
+            description: ConnectionStatus defines the observed state of Connection.
             properties:
               os:
                 description: OS contains information about the discovered operating
-                  system of the system.
+                  system.
                 properties:
                   name:
                     description: Name is the name of the operating system.

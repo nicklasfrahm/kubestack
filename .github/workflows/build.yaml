@@ -159,5 +159,9 @@ jobs:
 
       - name: Create release
         uses: codfish/semantic-release-action@v2
+        id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Index CRDs
+        run: curl -sSL https://doc.crds.dev/github.com/${{ github.repository }}@v${{ steps.semantic.outputs.release-version }} > /dev/null

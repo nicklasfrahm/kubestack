@@ -10,6 +10,8 @@ Kubestack is a infrastructure orchestrator built on top of Kubernetes. The goal 
 - [**Networking**](./networking.md)  
   Kubestack provides low-level APIs to manage network infrastructure, such as `Interfaces`.
 
+If you are consuming the APIs you may also find the [auto-generated CRD documentation][crd-docs] useful.
+
 ## Architectural principles
 
 - **Agentless**  
@@ -18,3 +20,5 @@ Kubestack is a infrastructure orchestrator built on top of Kubernetes. The goal 
 ## License
 
 Kubestack is and will always be licensed under the terms of the MIT license.
+
+[crd-docs]: https://doc.crds.dev/github.com/nicklasfrahm/kubestack
