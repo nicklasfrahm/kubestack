@@ -84,7 +84,7 @@ bin/$(TARGET)-$(SUFFIX): $(SOURCES)
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
-	go run $(BUILD_FLAGS) ./cmd/$(TARGET)/main.go
+	go run $(BUILD_FLAGS) ./cmd/$(TARGET)/main.go -log-level=debug
 
 .PHONY: docker
 docker:
