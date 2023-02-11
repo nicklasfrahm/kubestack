@@ -19,8 +19,10 @@ package controllers
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -33,7 +35,8 @@ import (
 // InterfaceReconciler reconciles a Interface object
 type InterfaceReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	recorder record.EventRecorder
+	Scheme   *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=kubestack.nicklasfrahm.dev,resources=interfaces,verbs=get;list;watch;create;update;patch;delete
@@ -68,19 +71,20 @@ func (r *InterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	mgmt, err := management.NewClient(connRef, common.WithKubernetesClient(r.Client))
 	if err != nil {
-		// TODO: Log failed connection in event recorder.
+		r.recorder.Event(iface, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 	defer mgmt.Disconnect()
 
-	// TODO(user): CONTINUE HERE.
+	// TODO: CONTINUE HERE. Reconcile the interface.
+	// TODO: Set up scaffolding for finalizers.
 
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *InterfaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	// TODO: Create event recorder.
+	r.recorder = mgr.GetEventRecorderFor("interface-controller")
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.Interface{}).

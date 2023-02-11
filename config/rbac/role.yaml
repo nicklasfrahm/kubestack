@@ -6,6 +6,21 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - kubestack.nicklasfrahm.dev
   resources:
   - connections
@@ -31,13 +46,6 @@ rules:
   - get
   - patch
   - update
-- apiGroups:
-  - kubestack.nicklasfrahm.dev
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
 - apiGroups:
   - kubestack.nicklasfrahm.dev
   resources:

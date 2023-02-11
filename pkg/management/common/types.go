@@ -1,7 +1,7 @@
 package common
 
 import (
-	v1alpha1 "github.com/nicklasfrahm/kubestack/api/v1alpha1"
+	"github.com/nicklasfrahm/kubestack/api/v1alpha1"
 )
 
 // ClientFactory is a function that creates a new client.
@@ -14,9 +14,6 @@ type Client interface {
 	// Disconnect disconnects from the host.
 	Disconnect() error
 
-	// ProbeOS probes the operating system of the host.
-	ProbeOS() (*v1alpha1.OSInfo, error)
-
-	// TODO: ReconcileInterface reconciles an interface.
-	// ReconcileInterface(iface *v1alpha1.Interface) error
+	// OS returns information about the operating system the host.
+	OS() *v1alpha1.OSInfo
 }

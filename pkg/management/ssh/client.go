@@ -84,6 +84,12 @@ func (c *Client) Connect() error {
 		return err
 	}
 
+	// Probe the operating system.
+	c.os, err = c.probeOS()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -92,14 +98,20 @@ func (c *Client) Disconnect() error {
 	return c.ssh.Close()
 }
 
-// ProbeOS probes the operating system of the host.
-func (c *Client) ProbeOS() (*v1alpha1.OSInfo, error) {
+// OS returns information about the operating system the host.
+func (c *Client) OS() *v1alpha1.OSInfo {
+	return c.os
+}
+
+// probeOS probes the operating system of the host.
+func (c *Client) probeOS() (*v1alpha1.OSInfo, error) {
 	osReleaseFile := "/etc/os-release"
 
 	session, err := c.ssh.SSH.NewSession()
 	if err != nil {
 		return nil, err
 	}
+	defer session.Close()
 
 	osReleaseRaw, err := session.Output(fmt.Sprintf("cat %s", osReleaseFile))
 	if err != nil {
@@ -124,11 +136,9 @@ func (c *Client) ProbeOS() (*v1alpha1.OSInfo, error) {
 		return nil, fmt.Errorf("failed to parse OS version from file: %s", osReleaseFile)
 	}
 
-	// Store the result internally for later use.
-	c.os = &v1alpha1.OSInfo{
+	// Return "Unknown" if either key can't be parsed.
+	return &v1alpha1.OSInfo{
 		Name:    osNameKey.MustString("Unknown"),
 		Version: osVersionKey.MustString("Unknown"),
-	}
-
-	return c.os, nil
+	}, nil
 }
