@@ -46,6 +46,6 @@ spec:
     # (optional) Configure switched VLANs.
     switchedVLAN:
       # (required) Configure the VLAN mode.
-      mode: Access
+      interfaceMode: Access
       # (required) Configure the access VLAN ID.
       accessVLAN: 5
