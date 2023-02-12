@@ -55,7 +55,7 @@ spec:
               description:
                 description: Description provides human-readable information about
                   the interface.
-                pattern: ^[a-zA-Z0-9 ]{1,255}$
+                pattern: ^[a-zA-Z0-9.,-_ ]{1,255}$
                 type: string
               enabled:
                 description: Enabled specifies whether the interface is enabled.

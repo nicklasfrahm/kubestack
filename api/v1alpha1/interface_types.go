@@ -186,7 +186,7 @@ type InterfaceSpec struct {
 	// LoopbackMode bool `json:"loopbackMode,omitempty"`
 
 	// Description provides human-readable information about the interface.
-	//+kubebuilder:validation:Pattern=`^[a-zA-Z0-9 ]{1,255}$`
+	//+kubebuilder:validation:Pattern=`^[a-zA-Z0-9.,-_ ]{1,255}$`
 	Description string `json:"description,omitempty"`
 
 	// Enabled specifies whether the interface is enabled.
