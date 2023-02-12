@@ -27,7 +27,6 @@ import (
 type ConnectionReference struct {
 	// Namespace of the connection.
 	Namespace string `json:"namespace,omitempty"`
-
 	// Name of the connection.
 	//+kubebuilder:validation:Required
 	Name string `json:"name"`
@@ -37,8 +36,8 @@ type ConnectionReference struct {
 type InterfaceSelector struct {
 	// Name is the name of the interface.
 	Name string `json:"name,omitempty"`
-
 	// MACAddress is the MAC address of the interface.
+	//+kubebuilder:validation:Pattern=`^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$`
 	MACAddress string `json:"macAddress,omitempty"`
 }
 
@@ -90,19 +89,27 @@ type IPv4 struct {
 // SwitchedVLANSpec defines the desired state of a switched VLAN.
 type SwitchedVLANSpec struct {
 	// InterfaceMode is the VLAN mode.
-	InterfaceMode ocif.Mode `json:"interfaceMode,omitempty"`
+	//+kubebuilder:validation:Required
+	//+kubebuilder:validation:Enum=Access;Trunk
+	InterfaceMode string `json:"interfaceMode"`
 	// NativeVLAN is the native VLAN.
-	NativeVLAN ocif.VLANID `json:"nativeVLAN,omitempty"`
+	//+kubebuilder:validation:Minimum=1
+	//+kubebuilder:validation:Maximum=4094
+	NativeVLAN int `json:"nativeVLAN,omitempty"`
 	// AccessVLAN is the access VLAN.
-	AccessVLAN ocif.VLANID `json:"accessVLAN,omitempty"`
+	//+kubebuilder:validation:Minimum=1
+	//+kubebuilder:validation:Maximum=4094
+	AccessVLAN int `json:"accessVLAN,omitempty"`
 	// TrunkVLANs is the list of trunk VLANs.
-	TrunkVLANs []ocif.VLANID `json:"trunkVLANs,omitempty"`
+	TrunkVLANs []int `json:"trunkVLANs,omitempty"`
 }
 
 // RoutedVLANSpec defines the desired state of a routed VLAN.
 type RoutedVLANSpec struct {
 	// VLANID is the VLAN ID of the routed VLAN.
-	VLAN ocif.VLANID `json:"vlan,omitempty"`
+	//+kubebuilder:validation:Minimum=1
+	//+kubebuilder:validation:Maximum=4094
+	VLAN int `json:"vlan,omitempty"`
 
 	// IPv4 configures the IPv4 address of the interface.
 	IPv4 IPv4 `json:"ipv4,omitempty"`

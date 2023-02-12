@@ -22,7 +22,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/nicklasfrahm/kubestack/pkg/openconfig/interfaces"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -363,7 +362,7 @@ func (in *SwitchedVLANSpec) DeepCopyInto(out *SwitchedVLANSpec) {
 	*out = *in
 	if in.TrunkVLANs != nil {
 		in, out := &in.TrunkVLANs, &out.TrunkVLANs
-		*out = make([]interfaces.VLANID, len(*in))
+		*out = make([]int, len(*in))
 		copy(*out, *in)
 	}
 }

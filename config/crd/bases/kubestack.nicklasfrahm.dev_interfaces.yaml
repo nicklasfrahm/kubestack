@@ -99,19 +99,27 @@ spec:
                     properties:
                       accessVLAN:
                         description: AccessVLAN is the access VLAN.
+                        maximum: 4094
+                        minimum: 1
                         type: integer
                       interfaceMode:
                         description: InterfaceMode is the VLAN mode.
+                        enum:
+                        - Access
+                        - Trunk
                         type: string
                       nativeVLAN:
                         description: NativeVLAN is the native VLAN.
+                        maximum: 4094
+                        minimum: 1
                         type: integer
                       trunkVLANs:
                         description: TrunkVLANs is the list of trunk VLANs.
                         items:
-                          description: VLANID is the ID of the VLAN.
                           type: integer
                         type: array
+                    required:
+                    - interfaceMode
                     type: object
                 type: object
               mtu:
@@ -163,6 +171,8 @@ spec:
                     type: object
                   vlan:
                     description: VLANID is the VLAN ID of the routed VLAN.
+                    maximum: 4094
+                    minimum: 1
                     type: integer
                 type: object
               selector:
@@ -171,6 +181,7 @@ spec:
                 properties:
                   macAddress:
                     description: MACAddress is the MAC address of the interface.
+                    pattern: ^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$
                     type: string
                   name:
                     description: Name is the name of the interface.
