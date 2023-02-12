@@ -1,6 +1,6 @@
 # Kubestack
 
-Kubestack is a infrastructure orchestrator built on top of Kubernetes. The goal is to provide APIs to build private clouds using Kubernetes as a control plane and API.
+Kubestack is an infrastructure orchestrator built on top of Kubernetes. The goal is to provide APIs to build private clouds using Kubernetes as a control plane and API.
 
 ## Overview
 
@@ -8,7 +8,7 @@ Kubestack is a infrastructure orchestrator built on top of Kubernetes. The goal 
   As Kubestack is built on top of **bare-metal infrastructure**, it requires foundational management APIs to connect to existing infrastructure, such as network appliances.
 
 - [**Networking**](./networking.md)  
-  Kubestack provides low-level APIs to manage network infrastructure, such as `Interfaces`.
+  Kubestack provides low-level APIs to manage network infrastructure, such as `Interfaces`. The data model is based on [OpenConfig][website-openconfig] while adapting it to Kubernetes API conventions.
 
 If you are consuming the APIs you may also find the [auto-generated CRD documentation][crd-docs] useful.
 
@@ -22,3 +22,4 @@ If you are consuming the APIs you may also find the [auto-generated CRD document
 Kubestack is and will always be licensed under the terms of the MIT license.
 
 [crd-docs]: https://doc.crds.dev/github.com/nicklasfrahm/kubestack
+[website-openconfig]: https://openconfig.net/

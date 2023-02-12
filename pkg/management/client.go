@@ -12,6 +12,13 @@ import (
 	"github.com/nicklasfrahm/kubestack/pkg/management/ssh"
 )
 
+const (
+	// OSNexus is the probed name of Cisco NX-OS.
+	OSNexus = "Nexus"
+	// OSUbuntu is the probed name of Ubuntu.
+	OSUbuntu = "Ubuntu"
+)
+
 var clientFactories = map[v1alpha1.Protocol]common.ClientFactory{
 	v1alpha1.ProtocolSSH: ssh.NewClient,
 	// TODO: Add support for SNMP.

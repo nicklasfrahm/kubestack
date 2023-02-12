@@ -38,3 +38,19 @@ LAST SEEN   TYPE      REASON             OBJECT            MESSAGE
 13m         Warning   ConnectionFailed   connection/alfa   Secret "connection-alfa" not found
 10m         Normal    OSProbed           connection/alfa   OS information probed successfully.
 ```
+
+## Support matrix
+
+| Vendor                 | Model                          | Protocol | OS                                                               | Status     |
+| ---------------------- | ------------------------------ | -------- | ---------------------------------------------------------------- | ---------- |
+| [Cisco][cisco]         | [Nexus 3048TP-1GE][nexus-3048] | SSH      | Nexus 9.3(10)I9                                                  | ✅ Tested  |
+| [Netgear][netgear]     | [GS748Tv4][gs748tv4]           | SNMP     | Baremetal 5.4.2.30                                               | 🚧 Planned |
+| [Canonical][canonical] | Generic                        | SSH      | [Ubuntu Server][ubuntu-server] 22.04 with [FRRouting][frrouting] | 🚧 Planned |
+
+[cisco]: https://www.cisco.com/
+[nexus-3048]: https://www.cisco.com/c/en/us/support/switches/nexus-3048-switch/model.html
+[netgear]: https://www.netgear.com/
+[gs748tv4]: https://www.netgear.com/support/product/GS748Tv4.aspx
+[canonical]: https://canonical.com/
+[ubuntu-server]: https://ubuntu.com/server
+[frrouting]: https://frrouting.org/

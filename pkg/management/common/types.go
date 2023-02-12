@@ -16,4 +16,7 @@ type Client interface {
 
 	// OS returns information about the operating system the host.
 	OS() *v1alpha1.OSInfo
+
+	// Driver returns the underlying transport driver.
+	Driver() interface{}
 }
