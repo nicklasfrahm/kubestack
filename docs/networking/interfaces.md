@@ -8,7 +8,11 @@ You may get a list of network interfaces by running the following command.
 kubectl get if
 ```
 
-<!-- TODO: Add command output. -->
+```text
+NAME                  CONNECTION-NAME   SELECTOR-NAME   VLAN-MODE
+distswitch00-eth1-1   distswitch00      eth1/1          Access
+distswitch00-eth1-3   distswitch00      eth1/3          Trunk
+```
 
 ## VLAN
 

@@ -84,7 +84,7 @@ type ConnectionStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:resource:categories=all,shortName=conn,path=connections,singular=connection
+//+kubebuilder:resource:categories={mgmt,management},shortName=conn,path=connections,singular=connection
 //+kubebuilder:printcolumn:name="Protocol",type=string,JSONPath=`.spec.protocol`
 //+kubebuilder:printcolumn:name="OS-Name",type=string,JSONPath=`.status.os.name`
 //+kubebuilder:printcolumn:name="OS-Version",type=string,JSONPath=`.status.os.version`

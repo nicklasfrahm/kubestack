@@ -1,6 +1,7 @@
 apiVersion: kubestack.nicklasfrahm.dev/v1alpha1
 kind: Connection
 metadata:
+  # (optional) These labels are not required for Kubestack to work.
   labels:
     app.kubernetes.io/name: connection
     app.kubernetes.io/instance: alfa

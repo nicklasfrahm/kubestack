@@ -231,7 +231,10 @@ type InterfaceStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:resource:categories=all,shortName=if,path=interfaces,singular=interface
+//+kubebuilder:resource:categories={net,network,networking},shortName=if,path=interfaces,singular=interface
+//+kubebuilder:printcolumn:name="Connection-Name",type=string,JSONPath=`.spec.connectionRef.name`
+//+kubebuilder:printcolumn:name="Selector-Name",type=string,JSONPath=`.spec.selector.name`
+//+kubebuilder:printcolumn:name="VLAN-Mode",type=string,JSONPath=`.spec.ethernet.switchedVLAN.interfaceMode`
 
 // Interface is the Schema for the interfaces API
 type Interface struct {

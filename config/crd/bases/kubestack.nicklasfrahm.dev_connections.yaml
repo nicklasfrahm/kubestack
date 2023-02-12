@@ -10,7 +10,8 @@ spec:
   group: kubestack.nicklasfrahm.dev
   names:
     categories:
-    - all
+    - mgmt
+    - management
     kind: Connection
     listKind: ConnectionList
     plural: connections

@@ -10,7 +10,9 @@ spec:
   group: kubestack.nicklasfrahm.dev
   names:
     categories:
-    - all
+    - net
+    - network
+    - networking
     kind: Interface
     listKind: InterfaceList
     plural: interfaces
@@ -19,7 +21,17 @@ spec:
     singular: interface
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.connectionRef.name
+      name: Connection-Name
+      type: string
+    - jsonPath: .spec.selector.name
+      name: Selector-Name
+      type: string
+    - jsonPath: .spec.ethernet.switchedVLAN.interfaceMode
+      name: VLAN-Mode
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Interface is the Schema for the interfaces API

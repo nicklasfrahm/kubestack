@@ -1,6 +1,7 @@
 apiVersion: kubestack.nicklasfrahm.dev/v1alpha1
 kind: Interface
 metadata:
+  # (optional) These labels are not required for Kubestack to work.
   labels:
     app.kubernetes.io/name: interface
     app.kubernetes.io/instance: distswitch00-eth1-1
