@@ -103,11 +103,6 @@ func (c *Client) OS() *v1alpha1.OSInfo {
 	return c.os
 }
 
-// Driver returns the underlying transport driver.
-func (c *Client) Driver() interface{} {
-	return c.ssh.SSH
-}
-
 // probeOS probes the operating system of the host.
 func (c *Client) probeOS() (*v1alpha1.OSInfo, error) {
 	osReleaseFile := "/etc/os-release"

@@ -12,12 +12,8 @@ import (
 	"github.com/nicklasfrahm/kubestack/pkg/management/ssh"
 )
 
-const (
-	// OSNexus is the probed name of Cisco NX-OS.
-	OSNexus = "Nexus"
-	// OSUbuntu is the probed name of Ubuntu.
-	OSUbuntu = "Ubuntu"
-)
+// TODO: Investigate if we can reduce the tight
+// coupling between the client and Kubernetes.
 
 var clientFactories = map[v1alpha1.Protocol]common.ClientFactory{
 	v1alpha1.ProtocolSSH: ssh.NewClient,

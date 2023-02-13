@@ -4,6 +4,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+const (
+	// OSNexus is the probed name of Cisco NX-OS.
+	OSNexus = "Nexus"
+	// OSUbuntu is the probed name of Ubuntu.
+	OSUbuntu = "Ubuntu"
+)
+
 // Options contains the configuration for an operation.
 type Options struct {
 	KubernetesClient client.Client

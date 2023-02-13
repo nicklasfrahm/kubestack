@@ -18,10 +18,7 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
-	"golang.org/x/crypto/ssh"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -31,7 +28,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/nicklasfrahm/kubestack/api/v1alpha1"
-	"github.com/nicklasfrahm/kubestack/pkg/driver/nxos"
 	"github.com/nicklasfrahm/kubestack/pkg/management"
 	"github.com/nicklasfrahm/kubestack/pkg/management/common"
 )
@@ -80,28 +76,22 @@ func (r *InterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 	defer mgmt.Disconnect()
 
-	if mgmt.OS().Name == management.OSNexus {
-		nxosClient, err := nxos.NewClient(nxos.WithSSH(mgmt.Driver().(*ssh.Client)))
-		if err != nil {
-			r.recorder.Event(iface, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
-			return ctrl.Result{}, err
-		}
-
-		config, err := nxosClient.GetInterface(iface.Spec.Selector.Name)
-		if err != nil {
-			r.recorder.Event(iface, corev1.EventTypeWarning, "ConnectionFailed", err.Error())
-			return ctrl.Result{}, err
-		}
-
-		prettyConfig, err := json.MarshalIndent(config, "", "  ")
-		if err != nil {
-			return ctrl.Result{}, err
-		}
-
-		fmt.Printf("%s\n", string(prettyConfig))
+	ifaceService, err := mgmt.Interface()
+	if err != nil {
+		r.recorder.Event(iface, corev1.EventTypeWarning, "MissingDriver", err.Error())
+		return ctrl.Result{}, nil
 	}
 
-	// TODO: CONTINUE HERE. Reconcile the interface.
+	if iface, err = ifaceService.UpdateInterface(iface); err != nil {
+		r.recorder.Event(iface, corev1.EventTypeWarning, "UpdateFailed", err.Error())
+		return ctrl.Result{}, nil
+	}
+
+	// Enable two-way sync.
+	if err := r.Update(ctx, iface); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
 	// TODO: Set up scaffolding for finalizers.
 
 	return ctrl.Result{}, nil

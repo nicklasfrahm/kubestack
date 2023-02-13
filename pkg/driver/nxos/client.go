@@ -23,6 +23,10 @@ func NewClient(opts ...Option) (*Client, error) {
 		return nil, err
 	}
 
+	if client.SSH == nil {
+		return nil, fmt.Errorf("missing required option: WithSSH()")
+	}
+
 	return client, nil
 }
 

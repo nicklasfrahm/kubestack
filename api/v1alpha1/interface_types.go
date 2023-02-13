@@ -22,6 +22,18 @@ import (
 	ocif "github.com/nicklasfrahm/kubestack/pkg/openconfig/interfaces"
 )
 
+// VLANMode is the VLAN mode.
+type VLANMode string
+
+const (
+	// VLANModeAccess is the access VLAN mode. Sometimes also referred
+	// to as `untagged` as the frames do not have the 802.1Q tag.
+	VLANModeAccess VLANMode = "Access"
+	// VLANModeTrunk is the trunk VLAN mode. Sometimes also referred
+	// to as `tagged` as the frames have the 802.1Q tag.
+	VLANModeTrunk VLANMode = "Trunk"
+)
+
 // ConnectionReference is the reference to the connection
 // that the interface is associated with.
 type ConnectionReference struct {
@@ -91,7 +103,7 @@ type SwitchedVLANSpec struct {
 	// InterfaceMode is the VLAN mode.
 	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum=Access;Trunk
-	InterfaceMode string `json:"interfaceMode"`
+	InterfaceMode VLANMode `json:"interfaceMode"`
 	// NativeVLAN is the native VLAN.
 	//+kubebuilder:validation:Minimum=1
 	//+kubebuilder:validation:Maximum=4094
@@ -146,9 +158,9 @@ type EthernetSpec struct {
 	// link speed to a fixed value.
 	PortSpeed ocif.EthernetSpeed `json:"portSpeed,omitempty"`
 
-	// TODO: Add support for controlling flow control.
 	// EnableFlowControl specifies whether flow control is enabled.
-	// EnableFlowControl bool `json:"enableFlowControl,omitempty"`
+	// If not specified, the default value is `false`.
+	EnableFlowControl bool `json:"enableFlowControl,omitempty"`
 
 	// FECMode configures the forward error correction mode.
 	// FECMode ocif.FECMode `json:"fecMode,omitempty"`
@@ -158,7 +170,7 @@ type EthernetSpec struct {
 	// AggregateID int `json:"aggregateId,omitempty"`
 
 	// SwitchedVLAN specifies the VLAN configuration of the interface.
-	SwitchedVLAN SwitchedVLANSpec `json:"switchedVLAN,omitempty"`
+	SwitchedVLAN *SwitchedVLANSpec `json:"switchedVLAN,omitempty"`
 
 	// TODO: Add support for PoE.
 
@@ -213,14 +225,14 @@ type InterfaceSpec struct {
 	// TODO: Add support for hold time.
 
 	// Ethernet configures the Ethernet-specific properties of the interface.
-	Ethernet EthernetSpec `json:"ethernet,omitempty"`
+	Ethernet *EthernetSpec `json:"ethernet,omitempty"`
 
 	// TODO: Add support for aggregation.
 
 	// TODO: Add support for subinterfaces.
 
 	// RoutedVLAN specifies the VLAN configuration of the interface.
-	RoutedVLAN RoutedVLANSpec `json:"routedVLAN,omitempty"`
+	RoutedVLAN *RoutedVLANSpec `json:"routedVLAN,omitempty"`
 }
 
 // InterfaceStatus defines the observed state of Interface
