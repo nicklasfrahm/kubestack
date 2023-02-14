@@ -170,7 +170,7 @@ type EthernetSpec struct {
 	// AggregateID int `json:"aggregateId,omitempty"`
 
 	// SwitchedVLAN specifies the VLAN configuration of the interface.
-	SwitchedVLAN *SwitchedVLANSpec `json:"switchedVLAN,omitempty"`
+	SwitchedVLAN SwitchedVLANSpec `json:"switchedVLAN,omitempty"`
 
 	// TODO: Add support for PoE.
 
@@ -225,14 +225,14 @@ type InterfaceSpec struct {
 	// TODO: Add support for hold time.
 
 	// Ethernet configures the Ethernet-specific properties of the interface.
-	Ethernet *EthernetSpec `json:"ethernet,omitempty"`
+	Ethernet EthernetSpec `json:"ethernet,omitempty"`
 
 	// TODO: Add support for aggregation.
 
 	// TODO: Add support for subinterfaces.
 
 	// RoutedVLAN specifies the VLAN configuration of the interface.
-	RoutedVLAN *RoutedVLANSpec `json:"routedVLAN,omitempty"`
+	RoutedVLAN RoutedVLANSpec `json:"routedVLAN,omitempty"`
 }
 
 // InterfaceStatus defines the observed state of Interface

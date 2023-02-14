@@ -91,6 +91,10 @@ spec:
                     - Half
                     - Full
                     type: string
+                  enableFlowControl:
+                    description: EnableFlowControl specifies whether flow control
+                      is enabled. If not specified, the default value is `false`.
+                    type: boolean
                   macAddress:
                     description: MACAddress allows to override the system-assigned
                       address of the interface.

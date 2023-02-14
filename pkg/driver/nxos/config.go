@@ -68,15 +68,3 @@ func Parse(raw string) (*Config, error) {
 
 	return config, nil
 }
-
-// normalizeInterfaceNames normalizes interface names.
-func normalizeInterfaceNames(raw string) string {
-	if !strings.HasPrefix(raw, "interface") {
-		return raw
-	}
-
-	raw = strings.ToLower(raw)
-	raw = strings.ReplaceAll(raw, "ethernet", "eth")
-
-	return raw
-}

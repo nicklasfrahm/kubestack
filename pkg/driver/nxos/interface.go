@@ -2,6 +2,8 @@ package nxos
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/nicklasfrahm/kubestack/api/v1alpha1"
 )
@@ -29,7 +31,7 @@ func ValidateInterface(iface *v1alpha1.Interface) error {
 // UnmarshalInterface unmarshals the OpenConfig interface configuration into the driver-specific format.
 func UnmarshalInterface(iface *v1alpha1.Interface) (*Config, error) {
 	section := Section{
-		Header: fmt.Sprintf("interface %s", iface.Name),
+		Header: normalizeInterfaceNames(fmt.Sprintf("interface %s", iface.Name)),
 		Lines:  make(map[string]bool),
 	}
 
@@ -41,45 +43,40 @@ func UnmarshalInterface(iface *v1alpha1.Interface) (*Config, error) {
 		section.Lines[fmt.Sprintf("description %s", iface.Spec.Description)] = true
 	}
 
-	if iface.Spec.Enabled {
-		section.Lines["no shutdown"] = true
-	} else {
+	if !iface.Spec.Enabled {
 		section.Lines["shutdown"] = true
 	}
 
-	if iface.Spec.Ethernet != nil {
-		if iface.Spec.Ethernet.AutoNegotiate {
-			section.Lines["negotiate auto"] = true
+	if iface.Spec.Ethernet.AutoNegotiate {
+		section.Lines["negotiate auto"] = true
+	}
+
+	// TODO: Not supported on n3k platform.
+	//       How should we handle this?
+	if iface.Spec.Ethernet.EnableFlowControl {
+		section.Lines["flowcontrol receive on"] = true
+		section.Lines["flowcontrol send on"] = true
+	}
+
+	if iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode == v1alpha1.VLANModeTrunk {
+		section.Lines["switchport mode trunk"] = true
+
+		if iface.Spec.Ethernet.SwitchedVLAN.NativeVLAN != 0 {
+			section.Lines[fmt.Sprintf("switchport trunk native vlan %d", iface.Spec.Ethernet.SwitchedVLAN.NativeVLAN)] = true
 		}
 
-		if iface.Spec.Ethernet.EnableFlowControl {
-			section.Lines["flowcontrol receive on"] = true
-			section.Lines["flowcontrol send on"] = true
-		} else {
-			section.Lines["flowcontrol receive off"] = true
-			section.Lines["flowcontrol send off"] = true
+		for _, vlan := range iface.Spec.Ethernet.SwitchedVLAN.TrunkVLANs {
+			section.Lines[fmt.Sprintf("switchport trunk allowed vlan %d", vlan)] = true
 		}
+	}
 
-		if iface.Spec.Ethernet.SwitchedVLAN != nil {
-			if iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode == v1alpha1.VLANModeTrunk {
-				section.Lines["switchport mode trunk"] = true
+	// The user must explicitly configure the interface mode to be `Access`.
+	// Skipping this will prevent the access VLAN ID from being configured.
+	if iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode == v1alpha1.VLANModeAccess {
+		section.Lines["switchport mode access"] = true
 
-				if iface.Spec.Ethernet.SwitchedVLAN.NativeVLAN != 0 {
-					section.Lines[fmt.Sprintf("switchport trunk native vlan %d", iface.Spec.Ethernet.SwitchedVLAN.NativeVLAN)] = true
-				}
-
-				for _, vlan := range iface.Spec.Ethernet.SwitchedVLAN.TrunkVLANs {
-					section.Lines[fmt.Sprintf("switchport trunk allowed vlan %d", vlan)] = true
-				}
-			}
-
-			if iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode == v1alpha1.VLANModeAccess {
-				section.Lines["switchport mode access"] = true
-
-				if iface.Spec.Ethernet.SwitchedVLAN.AccessVLAN != 0 {
-					section.Lines[fmt.Sprintf("switchport access vlan %d", iface.Spec.Ethernet.SwitchedVLAN.AccessVLAN)] = true
-				}
-			}
+		if iface.Spec.Ethernet.SwitchedVLAN.AccessVLAN != 0 {
+			section.Lines[fmt.Sprintf("switchport access vlan %d", iface.Spec.Ethernet.SwitchedVLAN.AccessVLAN)] = true
 		}
 	}
 
@@ -92,10 +89,94 @@ func UnmarshalInterface(iface *v1alpha1.Interface) (*Config, error) {
 
 // MarshalInterface marshals the driver-specific interface configuration into the OpenConfig format.
 func MarshalInterface(config *Config) (*v1alpha1.Interface, error) {
+	if len(config.Sections) == 0 {
+		return nil, fmt.Errorf("failed to marshal config: no sections found")
+	}
 
-	// TODO: Implement this method.
+	section := config.Sections[0]
+	interfaceName := strings.TrimPrefix(normalizeInterfaceNames(section.Header), "interface ")
 
-	return nil, fmt.Errorf("method not implemented: MarshalInterface")
+	iface := &v1alpha1.Interface{
+		Spec: v1alpha1.InterfaceSpec{
+			Selector: v1alpha1.InterfaceSelector{
+				Name: interfaceName,
+			},
+		},
+	}
+
+	for line := range section.Lines {
+
+		if strings.HasPrefix(line, "mtu ") {
+			mtu, err := strconv.Atoi(strings.TrimPrefix(line, "mtu "))
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse MTU: %w", err)
+			}
+			iface.Spec.MTU = mtu
+			continue
+		}
+
+		if strings.HasPrefix(line, "description ") {
+			iface.Spec.Description = strings.TrimPrefix(line, "description ")
+			continue
+		}
+
+		if strings.HasPrefix(line, "shutdown") {
+			iface.Spec.Enabled = false
+			continue
+		}
+
+		if strings.HasPrefix(line, "negotiate auto") {
+			iface.Spec.Ethernet.AutoNegotiate = true
+			continue
+		}
+
+		if strings.HasPrefix(line, "flowcontrol receive on") {
+			iface.Spec.Ethernet.EnableFlowControl = true
+			continue
+		}
+
+		if strings.HasPrefix(line, "flowcontrol send on") {
+			iface.Spec.Ethernet.EnableFlowControl = true
+			continue
+		}
+
+		if strings.HasPrefix(line, "switchport mode trunk") {
+			iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode = v1alpha1.VLANModeTrunk
+			continue
+		}
+
+		if strings.HasPrefix(line, "switchport trunk native vlan ") {
+			iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode = v1alpha1.VLANModeTrunk
+			vlan, err := strconv.Atoi(strings.TrimPrefix(line, "switchport trunk native vlan "))
+			if err != nil {
+				return nil, err
+			}
+			iface.Spec.Ethernet.SwitchedVLAN.NativeVLAN = vlan
+			continue
+		}
+
+		if strings.HasPrefix(line, "switchport trunk allowed vlan ") {
+			iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode = v1alpha1.VLANModeTrunk
+			vlan, err := strconv.Atoi(strings.TrimPrefix(line, "switchport trunk allowed vlan "))
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse trunk VLAN ID: %w", err)
+			}
+			iface.Spec.Ethernet.SwitchedVLAN.TrunkVLANs = append(iface.Spec.Ethernet.SwitchedVLAN.TrunkVLANs, vlan)
+			continue
+		}
+
+		if strings.HasPrefix(line, "switchport access vlan") {
+			iface.Spec.Ethernet.SwitchedVLAN.InterfaceMode = v1alpha1.VLANModeAccess
+			vlan, err := strconv.Atoi(strings.TrimPrefix(line, "switchport access vlan "))
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse access VLAN ID: %w", err)
+			}
+			iface.Spec.Ethernet.SwitchedVLAN.AccessVLAN = vlan
+			continue
+		}
+	}
+
+	return iface, nil
 }
 
 // ListInterfaces lists all interfaces.
@@ -150,17 +231,21 @@ func (c *Client) UpdateInterface(iface *v1alpha1.Interface) (*v1alpha1.Interface
 	}
 
 	// Convert OpenConfig interface configuration into NX-OS specific format.
-	config, err := UnmarshalInterface(iface)
+	desired, err := UnmarshalInterface(iface)
 	if err != nil {
 		return nil, err
 	}
-	_ = config
+	_ = desired
 
-	// TODO: Read current configuration in NX-OS specific format.
+	current, err := c.getInterface(iface.Spec.Selector.Name)
+	if err != nil {
+		return nil, err
+	}
+	_ = current
 
 	// TODO: Diff target and current configuration.
 
-	// TODO: Render configuration.
+	// TODO: Render commands to apply diff.
 
 	// TODO: Apply surgical configuration update.
 
@@ -175,8 +260,31 @@ func (c *Client) DeleteInterface(iface *v1alpha1.Interface) error {
 		return ErrMissingSelectorName
 	}
 
+	desired := Config{
+		Sections: []Section{
+			{
+				Header: fmt.Sprintf("interface %s", iface.Spec.Selector.Name),
+			},
+		},
+	}
+	_ = desired
+
 	// TODO: Technically speaking, this should be a low-hanging fruit,
 	//       because the deletion would only clear all current configuration.
 
 	return fmt.Errorf("method not implemented: DeleteInterface")
+}
+
+// normalizeInterfaceNames normalizes interface names.
+// This function lowercases the interface name and
+// replaces "Ethernet" with "eth".
+func normalizeInterfaceNames(raw string) string {
+	if !strings.HasPrefix(raw, "interface") {
+		return raw
+	}
+
+	raw = strings.ToLower(raw)
+	raw = strings.ReplaceAll(raw, "ethernet", "eth")
+
+	return raw
 }

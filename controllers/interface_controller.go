@@ -82,13 +82,14 @@ func (r *InterfaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
-	if iface, err = ifaceService.UpdateInterface(iface); err != nil {
+	updatedIface, err := ifaceService.UpdateInterface(iface)
+	if err != nil {
 		r.recorder.Event(iface, corev1.EventTypeWarning, "UpdateFailed", err.Error())
 		return ctrl.Result{}, nil
 	}
 
 	// Enable two-way sync.
-	if err := r.Update(ctx, iface); err != nil {
+	if err := r.Update(ctx, updatedIface); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 

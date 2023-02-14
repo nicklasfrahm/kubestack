@@ -69,7 +69,7 @@ type ConnectionSpec struct {
 	Protocol Protocol `json:"protocol"`
 
 	// SSH contains additional SSH connection options.
-	SSH *ConnectionSpecSSHOptions `json:"ssh,omitempty"`
+	SSH ConnectionSpecSSHOptions `json:"ssh,omitempty"`
 
 	// SecretRef is the reference to a secret containing sensitive connection credentials.
 	//+kubebuilder:validation:Required
