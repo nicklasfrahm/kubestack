@@ -32,3 +32,10 @@ Dockerfile.cross
 
 # Build artifacts
 public/
+!web/public/
+
+# Environment configuration.
+.env
+
+# Node modules.
+node_modules/
