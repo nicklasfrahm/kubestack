@@ -5,5 +5,6 @@
 <style lang="postcss">
   :global(html) {
     @apply bg-gray-200;
+    @apply p-4;
   }
 </style>
