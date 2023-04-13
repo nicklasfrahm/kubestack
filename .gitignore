@@ -32,3 +32,6 @@ Dockerfile.cross
 
 # Build artifacts
 public/
+
+# Ignore node dependencies.
+node_modules/
